@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <link href="app-style.css" rel="stylesheet" type="text/css">
+
+    <link rel="stylesheet" type="text/css" href="https://unpkg.com/bootstrap@4.3.1/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="https://unpkg.com/bootstrap-vue@2.0.0-rc.27/dist/bootstrap-vue.css">
+    <script type="text/javascript" src="https://unpkg.com/babel-polyfill/dist/polyfill.min.js"></script>
+    <script type="text/javascript" src="https://unpkg.com/vue@2.6.10/dist/vue.min.js"></script>
+    <script type="text/javascript" src="https://unpkg.com/bootstrap-vue@2.0.0-rc.27/dist/bootstrap-vue.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+</head>
+
+<body>
+    <b-container-fluid id="app">
+        <b-navbar type="dark" variant="dark">
+            <b-navbar-brand href="#">Currency</b-navbar-brand>
+            <b-navbar-nav>
+                <b-nav-item href="#">Change Currency</b-nav-item>
+                <b-nav-item v-on:click="showPrev10">Prev x10</b-nav-item>
+                <b-nav-item v-on:click="showNext10">Next x10</b-nav-item>
+            </b-navbar-nav>
+        </b-navbar>
+
+        <b-row class="text-center">
+            <b-col cols="8">
+                <b-card-group deck>
+                    <b-card bg-variant="primary" text-variant="white" no-body
+                        :header="baseCurrency + ' &raquo; ' + targetCurrency">
+                        <b-list-group>
+                            <b-list-group-item variant="secondary" v-for="(item, index) in currencyItems"
+                                v-bind:href="'#'+item">
+                                <span>{{ item.baseAmt }}</span>
+                                <span> &raquo; </span>
+                                <span>{{ item.targetAmt }}</span>
+                            </b-list-group-item>
+                        </b-list-group>
+                    </b-card>
+                </b-card-group>
+            </b-col>
+        </b-row>
+    </b-container-fluid>
+
+    <script src="app.js"></script>
+</body>
+</html>
