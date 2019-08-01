@@ -1,4 +1,4 @@
-
+//////////////////////////////////////////////////////////////////////
 Vue.component("donkey-item", {
     props: ["currencyItem", "isParent"],
     data: function () {
@@ -11,14 +11,14 @@ Vue.component("donkey-item", {
     :variant="isParent ? 'primary' : 'info'" 
     :button="isParent" 
     v-on:click="$emit('click')">
-        <span>{{ currencyItem.baseAmt }}</span>
+        <span>{{ currencyItem.baseAmtText }}</span>
         <span> &raquo; </span>
-        <span>{{ currencyItem.targetAmt }}</span>
+        <span>{{ currencyItem.targetAmtText }}</span>
     </b-list-group-item>
 `
 });
 
-
+//////////////////////////////////////////////////////////////////////
 Vue.component("donkey-parent", {
     props: ["currencyItem", "isParent"],
     data: function () {
@@ -55,8 +55,10 @@ Vue.component("donkey-parent", {
                 let noOfZeros = parseInt(Math.log10(currentItem.baseAmt)) - 1;
                 let tempBaseAmt = Math.pow(10, noOfZeros) * index;
 
-                item.baseAmt = formatMoney(parseFloat(currentItem.baseAmt) + tempBaseAmt, userOpt.baseDecimalPoint);
-                item.targetAmt = formatMoney((item.baseAmt * item.excRate), userOpt.targetDecimalPoint);
+                item.baseAmt = parseFloat(currentItem.baseAmt) + tempBaseAmt;
+                item.baseAmtText = formatMoney(item.baseAmt, SC_UserOpt.baseDecimalPoint);
+                item.targetAmt = (item.baseAmt * item.excRate);
+                item.targetAmtText = formatMoney(item.targetAmt, SC_UserOpt.targetDecimalPoint);
                 this.childItems.push(item);
             }
         }
@@ -79,5 +81,81 @@ Vue.component("donkey-parent", {
                 </b-list-group>
             </b-list-group-item>
         </div>
+    `
+});
+
+
+//////////////////////////////////////////////////////////////////////
+Vue.component("donkey-option", {
+    props: ["CurrencyList", "BaseCurrency", "TargetCurrency"],
+    data: function() {
+        return {
+            baseCurrencyCode: "",
+            targetCurrencyCode: ""
+        }
+    },
+    created: function() {
+        this.baseCurrencyCode = this.BaseCurrency;
+        this.targetCurrencyCode = this.TargetCurrency;
+    },
+    methods: {
+        swapCurrency() {
+            console.log("swapCurrency");
+            let tempCode = this.targetCurrencyCode;
+            this.targetCurrencyCode = this.baseCurrencyCode;
+            this.baseCurrencyCode = tempCode;
+        },
+
+        confirmCurrencyChanged() {
+            this.$emit("currency-changed", {
+                base: this.baseCurrencyCode,
+                target: this.targetCurrencyCode
+            });
+        }
+        
+    },
+    template: `
+        <b-modal id="modal-switch-currency" size="lg" title="Switch Currency"
+            ok-only
+            v-on:ok="confirmCurrencyChanged">
+            <b-row>
+                <b-col sm="4">
+                    <label for="baseCurrency">Base currency</label>
+                </b-col>
+                <b-col sm="7">
+                    <v-select id="baseCurrency" placeholder="-- select Base currency --" 
+                        :options="CurrencyList"
+                        :reduce="c => c.code"
+                        v-model="baseCurrencyCode"
+                        :key="baseCurrencyCode"
+                        label="countryName">
+                    </v-select>
+                </b-col>
+                <b-col sm="1">{{ baseCurrencyCode }}</b-col>
+            </b-row>
+            <b-row>
+                <b-col sm="4">
+                    <label for="targetCurrency">Target currency</label>
+                </b-col>
+                <b-col sm="7">
+                    <v-select id="targetCurrency" placeholder="-- select Target currency --" 
+                        :options="CurrencyList"
+                        :reduce="c => c.code"
+                        v-model="targetCurrencyCode"
+                        :key="targetCurrencyCode"
+                        label="countryName">
+                    </v-select>
+                </b-col>
+                <b-col sm="1">{{ targetCurrencyCode }}</b-col>
+            </b-row>
+            <b-row>
+                <b-col sm="4">
+                </b-col>
+                <b-col sm="8">
+                    <b-button class="symbol-2" v-b-tooltip.hover.right title="Swap currency"
+                        v-on:click="swapCurrency">&udarr;</b-button>
+                </b-col>
+            </b-row>
+        </b-modal>
     `
 });

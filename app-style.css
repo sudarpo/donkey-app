@@ -4,3 +4,9 @@ body {
 nav {
   margin-bottom: 3px;
 }
+.symbol { 
+  font-size: 2rem;
+}
+.symbol-2 { 
+  font-size: 4rem;
+}

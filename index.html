@@ -2,6 +2,7 @@
 <html lang="en">
 
 <head>
+    <title>Donkey Converter</title>
     <link href="app-style.css" rel="stylesheet" type="text/css">
 
     <link rel="stylesheet" type="text/css" href="https://unpkg.com/bootstrap@4.3.1/dist/css/bootstrap.min.css">
@@ -9,25 +10,36 @@
     <script type="text/javascript" src="https://unpkg.com/babel-polyfill/dist/polyfill.min.js"></script>
     <script type="text/javascript" src="https://unpkg.com/vue"></script>
     <script type="text/javascript" src="https://unpkg.com/bootstrap-vue@2.0.0-rc.27/dist/bootstrap-vue.js"></script>
+    <script type="text/javascript" src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+    <!-- use the latest vue-select release -->
+    <script src="https://unpkg.com/vue-select@latest"></script>
+    <link rel="stylesheet" href="https://unpkg.com/vue-select@latest/dist/vue-select.css">
+
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 </head>
 
 <body>
+    
     <b-container fluid id="app">
+        <div v-if="isLoading">Loading...</div>
+
+        <template v-if="!isLoading">
         <b-navbar type="dark" variant="dark">
-            <b-navbar-brand href="#">Currency</b-navbar-brand>
+            <b-navbar-brand href="#">Donkey Currency</b-navbar-brand>
             <b-navbar-nav>
-                <b-nav-item href="#">Change Currency</b-nav-item>
+                <b-nav-item v-on:click="switchCurrency">Switch Currency</b-nav-item>
                 <b-nav-item v-on:click="showPrev10">Prev x10</b-nav-item>
                 <b-nav-item v-on:click="showNext10">Next x10</b-nav-item>
             </b-navbar-nav>
         </b-navbar>
 
         <b-row class="text-center">
-            <b-col cols="8">
+            <b-col cols="12">
                 <b-card-group deck>
                     <b-card bg-variant="primary" text-variant="white" no-body
-                        :header="baseCurrency + ' &raquo; ' + targetCurrency">
+                        header-tag="header">
+                        <h4 slot="header">{{ baseCurrency }} <span class="symbol">&raquo;</span> {{ targetCurrency }}</h4>
                         <b-list-group>
                             <donkey-parent v-for="(item, index) in currencyItems"
                             v-bind:key="item.baseAmt"
@@ -37,9 +49,22 @@
                     </b-card>
                 </b-card-group>
             </b-col>
+            <b-col cols="4">
+                
+            </b-col>
         </b-row>
-    </b-container>
 
+        <donkey-option v-bind:currency-list="currencyList"
+            v-bind:base-currency="baseCurrency"
+            v-bind:target-currency="targetCurrency"
+            v-on:currency-changed="setCurrency($event)"></donkey-option>
+
+        <div>Exchange rate was last updated on {{ rateLastUpdated }}</div>
+        </template>
+    </b-container>
+    
+
+    <script src="currency-list.js"></script>
     <script src="donkey-item.js"></script>
     <script src="app.js"></script>
 </body>
