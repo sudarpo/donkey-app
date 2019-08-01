@@ -7,13 +7,13 @@
     <link rel="stylesheet" type="text/css" href="https://unpkg.com/bootstrap@4.3.1/dist/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="https://unpkg.com/bootstrap-vue@2.0.0-rc.27/dist/bootstrap-vue.css">
     <script type="text/javascript" src="https://unpkg.com/babel-polyfill/dist/polyfill.min.js"></script>
-    <script type="text/javascript" src="https://unpkg.com/vue@2.6.10/dist/vue.min.js"></script>
+    <script type="text/javascript" src="https://unpkg.com/vue"></script>
     <script type="text/javascript" src="https://unpkg.com/bootstrap-vue@2.0.0-rc.27/dist/bootstrap-vue.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 </head>
 
 <body>
-    <b-container-fluid id="app">
+    <b-container fluid id="app">
         <b-navbar type="dark" variant="dark">
             <b-navbar-brand href="#">Currency</b-navbar-brand>
             <b-navbar-nav>
@@ -29,19 +29,18 @@
                     <b-card bg-variant="primary" text-variant="white" no-body
                         :header="baseCurrency + ' &raquo; ' + targetCurrency">
                         <b-list-group>
-                            <b-list-group-item variant="secondary" v-for="(item, index) in currencyItems"
-                                v-bind:href="'#'+item">
-                                <span>{{ item.baseAmt }}</span>
-                                <span> &raquo; </span>
-                                <span>{{ item.targetAmt }}</span>
-                            </b-list-group-item>
+                            <donkey-parent v-for="(item, index) in currencyItems"
+                            v-bind:key="item.baseAmt"
+                            v-bind:is-parent="true"
+                            v-bind:currency-item="item"></donkey-parent>
                         </b-list-group>
                     </b-card>
                 </b-card-group>
             </b-col>
         </b-row>
-    </b-container-fluid>
+    </b-container>
 
+    <script src="donkey-item.js"></script>
     <script src="app.js"></script>
 </body>
 </html>
