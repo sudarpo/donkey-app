@@ -1,11 +1,7 @@
 //////////////////////////////////////////////////////////////////////
 Vue.component("donkey-item", {
     props: ["currencyItem", "isParent"],
-    data: function () {
-        return {
-            currencyName: ""
-        };
-    },
+
     template: `
     <b-list-group-item 
     :variant="isParent ? 'primary' : 'info'" 
@@ -25,18 +21,40 @@ Vue.component("donkey-parent", {
         return {
             isOpened: false,
             counter: 0,
+            id: "",
             childItems: []
         }
     },
+    
+    created: function() {
+        console.log(this.id, "donkey-parent CREATED", this.$vnode.key);
+        this.id = this.$vnode.key;
+        this.isOpened = false;
+        this.counter = 0;
+        this.childItems = [];
+    },
+
+    // updated: function() {
+    //     console.log(this.id, "donkey-parent UPDATED", "is it opened? " + this.isOpened);
+    // },
+
+    // mounted: function() {
+    //     console.log(this.id, "donkey-parent MOUNTED");
+    // },
+
+    // destroyed: function() {
+    //     console.log(this.id, "donkey-parent DESTROYED");
+    // },
+
     methods: {
         
         toggleInnerList: function (event) {
             this.counter += 1;
             this.isOpened = !this.isOpened;
-            console.log("toggleInnerList", this.isOpened, this.counter);
+            
             let currentItem = this.currencyItem;
-
-            console.log(currentItem);
+            // console.log("toggleInnerList", this.isOpened, this.counter);
+            // console.log(currentItem);
             
             this.childItems = [];
             if (this.isOpened) {
@@ -56,9 +74,9 @@ Vue.component("donkey-parent", {
                 let tempBaseAmt = Math.pow(10, noOfZeros) * index;
 
                 item.baseAmt = parseFloat(currentItem.baseAmt) + tempBaseAmt;
-                item.baseAmtText = formatMoney(item.baseAmt, SC_UserOpt.baseDecimalPoint);
+                item.baseAmtText = FormatMoney(item.baseAmt, SC_UserOpt.baseDecimalPoint);
                 item.targetAmt = (item.baseAmt * item.excRate);
-                item.targetAmtText = formatMoney(item.targetAmt, SC_UserOpt.targetDecimalPoint);
+                item.targetAmtText = FormatMoney(item.targetAmt, SC_UserOpt.targetDecimalPoint);
                 this.childItems.push(item);
             }
         }
@@ -76,7 +94,7 @@ Vue.component("donkey-parent", {
                     <donkey-item 
                     v-for="(item, index) in childItems"
                     v-bind:index-no="index"
-                    v-bind:key="index"
+                    v-bind:key="id + '_' + index"
                     v-bind:currency-item="item"></donkey-item>
                 </b-list-group>
             </b-list-group-item>
@@ -94,10 +112,12 @@ Vue.component("donkey-option", {
             targetCurrencyCode: ""
         }
     },
+
     created: function() {
         this.baseCurrencyCode = this.BaseCurrency;
         this.targetCurrencyCode = this.TargetCurrency;
     },
+
     methods: {
         swapCurrency() {
             console.log("swapCurrency");
@@ -114,15 +134,16 @@ Vue.component("donkey-option", {
         }
         
     },
+
     template: `
-        <b-modal id="modal-switch-currency" size="lg" title="Switch Currency"
+        <b-modal id="modal-switch-currency" size="xl" title="Switch Currency"
             ok-only
             v-on:ok="confirmCurrencyChanged">
             <b-row>
-                <b-col sm="4">
+                <b-col>
                     <label for="baseCurrency">Base currency</label>
                 </b-col>
-                <b-col sm="7">
+                <b-col cols="6">
                     <v-select id="baseCurrency" placeholder="-- select Base currency --" 
                         :options="CurrencyList"
                         :reduce="c => c.code"
@@ -131,13 +152,13 @@ Vue.component("donkey-option", {
                         label="countryName">
                     </v-select>
                 </b-col>
-                <b-col sm="1">{{ baseCurrencyCode }}</b-col>
+                <b-col>{{ baseCurrencyCode }}</b-col>
             </b-row>
             <b-row>
-                <b-col sm="4">
+                <b-col>
                     <label for="targetCurrency">Target currency</label>
                 </b-col>
-                <b-col sm="7">
+                <b-col cols="6">
                     <v-select id="targetCurrency" placeholder="-- select Target currency --" 
                         :options="CurrencyList"
                         :reduce="c => c.code"
@@ -146,12 +167,12 @@ Vue.component("donkey-option", {
                         label="countryName">
                     </v-select>
                 </b-col>
-                <b-col sm="1">{{ targetCurrencyCode }}</b-col>
+                <b-col>{{ targetCurrencyCode }}</b-col>
             </b-row>
             <b-row>
-                <b-col sm="4">
+                <b-col cols="4">
                 </b-col>
-                <b-col sm="8">
+                <b-col cols="8">
                     <b-button class="symbol-2" v-b-tooltip.hover.right title="Swap currency"
                         v-on:click="swapCurrency">&udarr;</b-button>
                 </b-col>

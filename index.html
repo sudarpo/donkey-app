@@ -2,6 +2,10 @@
 <html lang="en">
 
 <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    
     <title>Donkey Converter</title>
     <link href="app-style.css" rel="stylesheet" type="text/css">
 
@@ -16,7 +20,6 @@
     <script src="https://unpkg.com/vue-select@latest"></script>
     <link rel="stylesheet" href="https://unpkg.com/vue-select@latest/dist/vue-select.css">
 
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 </head>
 
 <body>
@@ -26,12 +29,15 @@
 
         <template v-if="!isLoading">
         <b-navbar type="dark" variant="dark">
-            <b-navbar-brand href="#">Donkey Currency</b-navbar-brand>
             <b-navbar-nav>
-                <b-nav-item v-on:click="switchCurrency">Switch Currency</b-nav-item>
-                <b-nav-item v-on:click="showPrev10">Prev x10</b-nav-item>
-                <b-nav-item v-on:click="showNext10">Next x10</b-nav-item>
+                <b-nav-item-dropdown text="Donkey">
+                    <b-dropdown-item v-on:click="switchCurrency">Switch Currency</b-dropdown-item>
+                    <b-dropdown-item v-on:click="triggerUpdateExchangeRate">Update Exchange Rate</b-dropdown-item>
+                </b-nav-item-dropdown>
+                <b-nav-item v-on:click="showPrev10" :disabled="currentPageNo==1">&divide;10</b-nav-item>
+                <b-nav-item v-on:click="showNext10">&times;10</b-nav-item>
             </b-navbar-nav>
+
         </b-navbar>
 
         <b-row class="text-center">
@@ -39,11 +45,12 @@
                 <b-card-group deck>
                     <b-card bg-variant="primary" text-variant="white" no-body
                         header-tag="header">
-                        <h4 slot="header">{{ baseCurrency }} <span class="symbol">&raquo;</span> {{ targetCurrency }}</h4>
+                        <div slot="header">{{ baseCurrency }} <span class="symbol">&raquo;</span> {{ targetCurrency }}</div>
                         <b-list-group>
                             <donkey-parent v-for="(item, index) in currencyItems"
-                            v-bind:key="item.baseAmt"
+                            v-bind:key="item.baseAmt + '_' + baseCurrency + '_' + targetCurrency"
                             v-bind:is-parent="true"
+                            v-bind:id="item.baseAmt"
                             v-bind:currency-item="item"></donkey-parent>
                         </b-list-group>
                     </b-card>
@@ -61,6 +68,11 @@
 
         <div>Exchange rate was last updated on {{ rateLastUpdated }}</div>
         </template>
+
+
+        <b-alert v-model="isAlertVisible" variant="danger" dismissible>
+            {{ GlobalErrorMessage }}
+        </b-alert>
     </b-container>
     
 
