@@ -67,8 +67,17 @@ window.onload = () => {
             if (localStorage.XRates) {
                 console.log("LocalStorage is NOT empty");
                 SC_XChangeRate = JSON.parse(localStorage.XRates);
+                
+                let differentInMinutes = this.getDifferentInMinutes();
+                if (differentInMinutes > 120) {
+                    this.triggerUpdateExchangeRate();
+                }
+                else{
+                    this.initialize();
+                }
+                
                 this.isLoading = false;
-                this.initialize();
+
             }
             else {
                 console.log("LocalStorage is empty");
@@ -150,11 +159,17 @@ window.onload = () => {
                 this.$bvModal.show("modal-switch-currency");
             },
 
-            triggerUpdateExchangeRate() {
-                // Check last updated time
+            getDifferentInMinutes() {
                 let lastUpdateTime = SC_XChangeRate.timestamp * 1000;
                 let currentTime = Date.now();
                 let differentInMinutes = (currentTime - lastUpdateTime) / 1000 / 60;
+                return differentInMinutes;
+            },
+
+            triggerUpdateExchangeRate() {
+
+                // Check last updated time
+                let differentInMinutes = this.getDifferentInMinutes();
                 if (differentInMinutes > 60) {
                     // If more than 60 minutes, get the latest exchange rates
                     this.makeToast("info", "Updating exchange rate...");
@@ -167,6 +182,7 @@ window.onload = () => {
                 else {
                     this.makeToast("info", "Exchange rate is already the latest available rate. Please update exchange rate every 1 hour.");
                 }
+                
             },
 
             setCurrency(updatedCurrency) {
@@ -202,7 +218,7 @@ window.onload = () => {
 
             makeToast(variant = null, message = "", isAutoHide = false) {
                 this.$bvToast.toast(message, {
-                    title: `SC`,
+                    title: `Donkey App`,
                     variant: variant,
                     solid: true,
                     noAutoHide: isAutoHide

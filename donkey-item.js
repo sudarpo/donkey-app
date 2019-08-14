@@ -27,7 +27,7 @@ Vue.component("donkey-parent", {
     },
     
     created: function() {
-        console.log(this.id, "donkey-parent CREATED", this.$vnode.key);
+        // console.log(this.id, "donkey-parent CREATED", this.$vnode.key);
         this.id = this.$vnode.key;
         this.isOpened = false;
         this.counter = 0;
