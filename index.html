@@ -15,9 +15,11 @@
 
     <link rel="stylesheet" type="text/css" href="https://unpkg.com/bootstrap@4.6.1/dist/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="https://unpkg.com/bootstrap-vue@2.23.1/dist/bootstrap-vue.min.css">
+    <link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap-vue@2.23.1/dist/bootstrap-vue-icons.min.css" />
     <script type="text/javascript" src="https://unpkg.com/babel-polyfill@6.26.0/dist/polyfill.min.js"></script>
     <script type="text/javascript" src="https://unpkg.com/vue@2.7.14/dist/vue.min.js"></script>
     <script type="text/javascript" src="https://unpkg.com/bootstrap-vue@2.23.1/dist/bootstrap-vue.min.js"></script>
+    <script type="text/javascript" src="https://unpkg.com/bootstrap-vue@2.23.1/dist/bootstrap-vue-icons.min.js"></script>
     <script type="text/javascript" src="https://unpkg.com/axios@1.4.0/dist/axios.min.js"></script>
 
     <!-- use the latest vue-select release -->
@@ -34,9 +36,20 @@
         <template v-if="!isLoading">
         <b-navbar type="dark" variant="dark">
             <b-navbar-nav>
-                <b-nav-item-dropdown text="Donkey">
-                    <b-dropdown-item v-on:click="switchCurrency">Switch Currency</b-dropdown-item>
-                    <b-dropdown-item v-on:click="triggerUpdateExchangeRate">Update Exchange Rate</b-dropdown-item>
+                <b-navbar-brand href="https://sudarpo.net/donkey-app">sudarpo.net</b-navbar-brand>
+                <b-nav-item-dropdown text="Donkey-App">
+                    <b-dropdown-item v-on:click="switchCurrency"><b-icon icon="gear"></b-icon> Choose Currency</b-dropdown-item>
+                    <b-dropdown-divider></b-dropdown-divider>
+                    <b-dropdown-group id="dropdown-group-1" header="&#x21af; Currency Presets">
+                        <b-dropdown-item-button v-on:click="setCurrency({base: 'SGD', target: 'MYR'})">SGD - MYR</b-dropdown-item-button>
+                        <b-dropdown-item-button v-on:click="setCurrency({base: 'SGD', target: 'IDR'})">SGD - IDR</b-dropdown-item-button>
+                        <b-dropdown-item-button v-on:click="setCurrency({base: 'SGD', target: 'USD'})">SGD - USD</b-dropdown-item-button>
+                        <b-dropdown-item-button v-on:click="setCurrency({base: 'SGD', target: 'AUD'})">SGD - AUD</b-dropdown-item-button>
+                        <b-dropdown-item-button v-on:click="setCurrency({base: 'SGD', target: 'JPY'})">SGD - JPY</b-dropdown-item-button>
+                        <b-dropdown-item-button v-on:click="setCurrency({base: 'SGD', target: 'VND'})">SGD - VND</b-dropdown-item-button>
+                      </b-dropdown-group>
+                    <b-dropdown-divider></b-dropdown-divider>
+                    <b-dropdown-item v-on:click="triggerUpdateExchangeRate"><b-icon icon="arrow-repeat"></b-icon> Update Exchange Rate</b-dropdown-item>
                 </b-nav-item-dropdown>
                 <b-nav-item v-on:click="showPrev10" :disabled="currentBaseNumber==1">&divide;10</b-nav-item>
                 <b-nav-item v-on:click="showNext10">&times;10</b-nav-item>
@@ -78,9 +91,12 @@
         <b-alert v-model="isAlertVisible" variant="danger" dismissible>
             {{ GlobalErrorMessage }}
         </b-alert>
+
+        <blockquote class="blockquote">
+            <footer class="blockquote-footer"><a href="https://sudarpo.net">sudarpo.net</a></footer>
+        </blockquote>
     </b-container>
     
-
     <script src="currency-list.js"></script>
     <script src="donkey-item.js"></script>
     <script src="app.js"></script>
