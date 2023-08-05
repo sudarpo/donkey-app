@@ -36,7 +36,6 @@
         <template v-if="!isLoading">
         <b-navbar type="dark" variant="dark">
             <b-navbar-nav>
-                <b-navbar-brand href="https://sudarpo.net/donkey-app">sudarpo.net</b-navbar-brand>
                 <b-nav-item-dropdown text="Donkey-App">
                     <b-dropdown-item v-on:click="switchCurrency"><b-icon icon="gear"></b-icon> Choose Currency</b-dropdown-item>
                     <b-dropdown-divider></b-dropdown-divider>
@@ -92,6 +91,7 @@
             {{ GlobalErrorMessage }}
         </b-alert>
 
+        <hr />
         <blockquote class="blockquote">
             <footer class="blockquote-footer"><a href="https://sudarpo.net">sudarpo.net</a></footer>
         </blockquote>
