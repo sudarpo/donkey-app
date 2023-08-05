@@ -111,7 +111,7 @@ window.onload = () => {
             },
 
             refreshExchangeRate: function() {
-                const rateUrl = "https://openexchangerates.org/api/latest.json?app_id=1370818c6bf04d01aafc2ca379aa171e";
+                const rateUrl = "https://openexchangerates.org/api/latest.json?app_id=330efd1b3dda49ecab74a654f7e436fd";
                 return axios
                     .get(rateUrl)
                     .then(response => {
