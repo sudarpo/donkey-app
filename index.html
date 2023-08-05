@@ -6,7 +6,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     
-    <title>Donkey Converter</title>
+    <title>Donkey App - Currency Converter</title>
     <link href="app-style.css" rel="stylesheet" type="text/css">
 
     <link rel="stylesheet" type="text/css" href="https://unpkg.com/bootstrap@4.6.1/dist/css/bootstrap.min.css">
@@ -34,8 +34,9 @@
                     <b-dropdown-item v-on:click="switchCurrency">Switch Currency</b-dropdown-item>
                     <b-dropdown-item v-on:click="triggerUpdateExchangeRate">Update Exchange Rate</b-dropdown-item>
                 </b-nav-item-dropdown>
-                <b-nav-item v-on:click="showPrev10" :disabled="currentPageNo==1">&divide;10</b-nav-item>
+                <b-nav-item v-on:click="showPrev10" :disabled="currentBaseNumber==1">&divide;10</b-nav-item>
                 <b-nav-item v-on:click="showNext10">&times;10</b-nav-item>
+                <b-nav-item v-on:click="swapCurrencyClicked">Swap &rlarr;</b-nav-item>
             </b-navbar-nav>
 
         </b-navbar>
@@ -64,7 +65,7 @@
         <donkey-option v-bind:currency-list="currencyList"
             v-bind:base-currency="baseCurrency"
             v-bind:target-currency="targetCurrency"
-            v-on:currency-changed="setCurrency($event)"></donkey-option>
+            v-on:currency-changed="onCurrencyChangeEvent($event)"></donkey-option>
 
         <div>Exchange rate was last updated on {{ rateLastUpdated }}</div>
         </template>

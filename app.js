@@ -16,10 +16,35 @@ function CurrencyCode() {
 function UserPreferences() {
     let baseCurrency = "";
     let targetCurrency = "";
-    let totalPerPage = 1;
-    let currentInput = 1;
+    let totalItemsPerPage = 10;
+    let baseNumber = 1;
     let baseDecimalPoint = 2;
     let targetDecimalPoint = 2;
+}
+
+let UserPrefs = {
+
+    // Initialize default values if no data is available.
+    initialize() {
+        SC_UserOpt.baseCurrency = "SGD";
+        SC_UserOpt.targetCurrency = "MYR";
+        SC_UserOpt.totalItemsPerPage = 10;
+        SC_UserOpt.baseNumber = 1;
+        SC_UserOpt.baseDecimalPoint = 2;
+        SC_UserOpt.targetDecimalPoint = 2;
+        this.save();
+    },
+
+    // Load user local storage
+    load() {
+        SC_UserOpt = JSON.parse(localStorage.UserPreferences);
+    },
+
+    // Save user local storage
+    save() {
+        localStorage.UserPreferences = JSON.stringify(SC_UserOpt);
+    },
+
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -28,16 +53,10 @@ let SC_CurrencyList = [];
 let SC_UserOpt = new UserPreferences();
 
 if (localStorage.UserPreferences) {
-    SC_UserOpt = JSON.parse(localStorage.UserPreferences);
+    UserPrefs.load();
 }
 else {
-    SC_UserOpt.baseCurrency = "SGD";
-    SC_UserOpt.targetCurrency = "MYR";
-    SC_UserOpt.totalPerPage = 10;
-    SC_UserOpt.currentInput = 1;
-    SC_UserOpt.baseDecimalPoint = 2;
-    SC_UserOpt.targetDecimalPoint = 2;
-    localStorage.UserPreferences = JSON.stringify(SC_UserOpt);
+    UserPrefs.initialize();
 }
 
 console.log(SC_UserOpt);
@@ -52,20 +71,25 @@ window.onload = () => {
         el: "#app",
         data() {
             return {
-                totalPerPage: SC_UserOpt.totalPerPage,
+                totalItemsPerPage: SC_UserOpt.totalItemsPerPage,
                 baseCurrency: SC_UserOpt.baseCurrency,
                 targetCurrency: SC_UserOpt.targetCurrency,
+                currentBaseNumber: SC_UserOpt.baseNumber,
                 currencyItems: [],
                 currencyList: [],
                 xchangeRate: 0.0,
                 rateLastUpdated: "",
-                currentPageNo: 1,
                 isLoading: true,
                 GlobalErrorMessage: "",
                 isAlertVisible: false
             };
         },
         
+        // Vue2 created - Called synchronously after the instance is created. 
+        // Initialization code.
+        // - Init and parse currency list
+        // - Check localstorage exchange rates data
+        // - Retrieve exchange rate if required
         created: function () {
             GetCurrencyList();
             if (localStorage.XRates) {
@@ -92,28 +116,20 @@ window.onload = () => {
                     });
                 
             }
+
         },
         
         methods: {
+            // Initialize component data.
             initialize: function() {
-                this.currentPageNo = 1;
+                console.log("initialize this.currentBaseNumber", this.currentBaseNumber)
                 this.currencyList = SC_CurrencyList;
                 this.refreshLastUpdatedDate();
                 this.setXchangeRate();
-                this.currencyItems = [];
-                for (let i = this.currentPageNo; i <= this.totalPerPage; i++) {
-                    let item = new CurrencyItem();
-                    item.baseCur = this.baseCurrency;
-                    item.targetCur = this.targetCurrency;
-                    item.excRate = this.xchangeRate;
-                    item.baseAmt = i;
-                    item.baseAmtText = FormatMoney(i, SC_UserOpt.baseDecimalPoint);
-                    item.targetAmt = (item.baseAmt * item.excRate);
-                    item.targetAmtText = FormatMoney(item.targetAmt, SC_UserOpt.targetDecimalPoint);
-                    this.currencyItems.push(item);
-                }
+                this.buildItemList(this.currentBaseNumber);
             },
 
+            // Refresh exchange rate via openexchangerates
             refreshExchangeRate: function() {
                 const rateUrl = `https://openexchangerates.org/api/latest.json?app_id=${app_id}`;
                 return axios
@@ -130,6 +146,7 @@ window.onload = () => {
                     });
             },
 
+            // Calculate and set exchange rate
             setXchangeRate: function() {
                 let xrates = SC_XChangeRate.rates;
                 let baseXRate = parseFloat(xrates[this.targetCurrency]) / parseFloat(xrates[this.baseCurrency]);
@@ -137,32 +154,43 @@ window.onload = () => {
                 this.xchangeRate = baseXRate;
             },
 
-            showNext10: function (event) {
-                let multiplier = this.currentPageNo * 10;
-                this.currentPageNo = multiplier;
-                this.buildItemList(multiplier);
+            // Update base number
+            updateBaseNumber: function(baseNumber) {
+                this.currentBaseNumber = baseNumber;
+                SC_UserOpt.baseNumber = this.currentBaseNumber;
+                UserPrefs.save();
+                this.buildItemList();
             },
 
+            // Multiple 10
+            showNext10: function (event) {
+                let multiplier = this.currentBaseNumber * 10;
+                this.updateBaseNumber(multiplier);
+            },
+
+            // Divide by 10
             showPrev10: function (event) {
-                if (this.currentPageNo > 1) {
-                    let multiplier = this.currentPageNo / 10;
-                    this.currentPageNo = multiplier;
-                    this.buildItemList(multiplier);
+                if (this.currentBaseNumber > 1) {
+                    let multiplier = this.currentBaseNumber / 10;
+                    this.updateBaseNumber(multiplier);
                 }
                 else {
                     this.makeToast("danger", "Lowest base number is 1");
                 }
             },
 
+            // Refresh last updated text label
             refreshLastUpdatedDate: function() {
                 let epochTime = SC_XChangeRate.timestamp * 1000;
                 this.rateLastUpdated = new Date(epochTime);
             },
 
+            // Toggle Switch Currency modal dialog
             switchCurrency() {
                 this.$bvModal.show("modal-switch-currency");
             },
 
+            // 
             getDifferentInMinutes() {
                 let lastUpdateTime = SC_XChangeRate.timestamp * 1000;
                 let currentTime = Date.now();
@@ -170,6 +198,7 @@ window.onload = () => {
                 return differentInMinutes;
             },
 
+            // Trigger update exchange rate on click
             triggerUpdateExchangeRate() {
 
                 // Check last updated time
@@ -189,25 +218,34 @@ window.onload = () => {
                 
             },
 
+            // For swap-currency clicked event from option modal page.
+            onCurrencyChangeEvent(updatedCurrency) {
+                this.setCurrency(updatedCurrency);
+            },
+
+            // For swap-currency clicked event.
+            swapCurrencyClicked() {
+                this.setCurrency({ base: this.targetCurrency, target: this.baseCurrency });
+            },
+
+            // Set currency event handler.
             setCurrency(updatedCurrency) {
                 // console.log("setTargetCurrency", updatedCurrency);
                 this.targetCurrency = updatedCurrency.target;
                 this.baseCurrency = updatedCurrency.base;
-                this.currentPageNo = 1;
 
                 SC_UserOpt.baseCurrency = this.baseCurrency;
                 SC_UserOpt.targetCurrency = this.targetCurrency;
-                localStorage.UserPreferences = JSON.stringify(SC_UserOpt);
+                UserPrefs.save();
                 this.initialize();
             },
 
-            buildItemList(multiplier) {
+            // Build and generate item list.
+            buildItemList() {
                 this.currencyItems = [];
-                for (
-                    let i = this.currentPageNo;
-                    i <= this.totalPerPage * multiplier;
-                    i += multiplier
-                ) {
+                let multiplier = this.currentBaseNumber;
+
+                for (let i = this.currentBaseNumber; i <= this.totalItemsPerPage * multiplier; i += multiplier) {
                     let item = new CurrencyItem();
                     item.baseCur = this.baseCurrency;
                     item.targetCur = this.targetCurrency;
@@ -220,6 +258,7 @@ window.onload = () => {
                 }
             },
 
+            // Create toast message.
             makeToast(variant = null, message = "", isAutoHide = false) {
                 this.$bvToast.toast(message, {
                     title: `Donkey App`,
@@ -229,6 +268,7 @@ window.onload = () => {
                 })
             },
 
+            // Show toast error message.
             showErrorMessage(errorMsg) {
                 this.makeToast("danger", errorMsg, true);
             }
