@@ -23,9 +23,10 @@ function UserPreferences() {
 }
 
 //////////////////////////////////////////////////////////////////////
-var SC_CurrencyList = [];
+let SC_XChangeRate = {};
+let SC_CurrencyList = [];
+let SC_UserOpt = new UserPreferences();
 
-var SC_UserOpt = new UserPreferences();
 if (localStorage.UserPreferences) {
     SC_UserOpt = JSON.parse(localStorage.UserPreferences);
 }
@@ -42,7 +43,10 @@ else {
 console.log(SC_UserOpt);
 
 Vue.component('v-select', VueSelect.VueSelect);
+
 //////////////////////////////////////////////////////////////////////
+const app_id = "330efd1b3dda49ecab74a654f7e436fd";
+
 window.onload = () => {
     new Vue({
         el: "#app",
@@ -111,7 +115,7 @@ window.onload = () => {
             },
 
             refreshExchangeRate: function() {
-                const rateUrl = "https://openexchangerates.org/api/latest.json?app_id=330efd1b3dda49ecab74a654f7e436fd";
+                const rateUrl = `https://openexchangerates.org/api/latest.json?app_id=${app_id}`;
                 return axios
                     .get(rateUrl)
                     .then(response => {
@@ -245,7 +249,7 @@ function GetCurrencyList() {
 }
 
 // Create our number formatter.
-var formatter = new Intl.NumberFormat('en-SG', {
+let formatter = new Intl.NumberFormat('en-SG', {
     style: 'currency',
     currency: 'SGD',
 });
@@ -269,4 +273,3 @@ function FormatMoney(amount, decimalCount = 2, decimal = ".", thousands = ",") {
 };
 
 //////////////////////////////////////////////////////////////////////
-var SC_XChangeRate = {}
