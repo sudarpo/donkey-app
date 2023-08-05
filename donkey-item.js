@@ -170,11 +170,13 @@ Vue.component("donkey-option", {
                 <b-col>{{ targetCurrencyCode }}</b-col>
             </b-row>
             <b-row>
-                <b-col cols="4">
+                <b-col>
                 </b-col>
-                <b-col cols="8">
+                <b-col cols="6">
                     <b-button class="symbol-2" v-b-tooltip.hover.right title="Swap currency"
-                        v-on:click="swapCurrency">&udarr;</b-button>
+                        v-on:click="swapCurrency">Swap &rlarr;</b-button>
+                </b-col>
+                <b-col>
                 </b-col>
             </b-row>
         </b-modal>
