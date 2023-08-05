@@ -13,7 +13,7 @@ function CurrencyCode() {
     let countryName = "";
 }
 
-function UserPreferences() {
+function UserOptions() {
     let baseCurrency = "";
     let targetCurrency = "";
     let totalItemsPerPage = 10;
@@ -35,12 +35,12 @@ let UserPrefs = {
         this.save();
     },
 
-    // Load user local storage
+    // Load user local storage.
     load() {
         SC_UserOpt = JSON.parse(localStorage.UserPreferences);
     },
 
-    // Save user local storage
+    // Save user local storage.
     save() {
         localStorage.UserPreferences = JSON.stringify(SC_UserOpt);
     },
@@ -50,10 +50,12 @@ let UserPrefs = {
 //////////////////////////////////////////////////////////////////////
 let SC_XChangeRate = {};
 let SC_CurrencyList = [];
-let SC_UserOpt = new UserPreferences();
+let SC_UserOpt = new UserOptions();
 
 if (localStorage.UserPreferences) {
     UserPrefs.load();
+    if (SC_UserOpt.baseNumber === undefined || SC_UserOpt.totalItemsPerPage === undefined) 
+        UserPrefs.initialize();
 }
 else {
     UserPrefs.initialize();
