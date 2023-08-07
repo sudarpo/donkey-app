@@ -143,8 +143,11 @@ Vue.component("donkey-option", {
 
     template: `
         <b-modal id="modal-switch-currency" size="xl" title="Switch Currency"
-            ok-only
-            v-on:ok="confirmCurrencyChanged">
+                ok-only ok-variant="secondary"
+                v-on:ok="confirmCurrencyChanged"
+                body-class="bg-dark text-white"
+                header-class="bg-dark text-white"
+                footer-class="bg-dark text-white">
             <b-row>
                 <b-col>
                     <label for="baseCurrency">Base currency</label>
