@@ -211,11 +211,11 @@ window.onload = () => {
                     this.refreshExchangeRate()
                     .finally(() => {
                         this.initialize();
-                        this.makeToast("success", "Exchange rate has been updated. Please update exchange rate ONLY every 1 hour.");
+                        this.makeToast("success", "Exchange rate has been updated. Exchange rate is ONLY updated every 1-hour.");
                     });
                 }
                 else {
-                    this.makeToast("info", "Exchange rate is already the latest available rate. Please update exchange rate every 1 hour.");
+                    this.makeToast("info", "Exchange rate is already the latest available rate. Exchange rate is ONLY updated every 1-hour.");
                 }
                 
             },
