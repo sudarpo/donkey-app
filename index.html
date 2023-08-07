@@ -13,7 +13,7 @@
     <link rel="manifest" href="/site.webmanifest">
     <link href="app-style.css" rel="stylesheet" type="text/css">
 
-    <link rel="stylesheet" type="text/css" href="https://unpkg.com/bootstrap@4.6.1/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="https://unpkg.com/bootstrap@4.6.2/dist/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="https://unpkg.com/bootstrap-vue@2.23.1/dist/bootstrap-vue.min.css">
     <link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap-vue@2.23.1/dist/bootstrap-vue-icons.min.css" />
     <script type="text/javascript" src="https://unpkg.com/babel-polyfill@6.26.0/dist/polyfill.min.js"></script>
@@ -25,10 +25,14 @@
     <!-- use the latest vue-select release -->
     <script src="https://unpkg.com/vue-select@3.20.2/dist/vue-select.js"></script>
     <link rel="stylesheet" href="https://unpkg.com/vue-select@3.20.2/dist/vue-select.css">
-
+    <style>
+        .card-header { font-size: 1.5rem; }
+        .list-group-item { font-size: 1.3rem; }
+        .dropdown-item:hover { background-color: #000; }
+    </style>
 </head>
 
-<body>
+<body class="bg-dark">
     
     <b-container fluid id="app">
         <div v-if="isLoading">Loading...</div>
@@ -36,19 +40,23 @@
         <template v-if="!isLoading">
         <b-navbar type="dark" variant="dark">
             <b-navbar-nav>
-                <b-nav-item-dropdown text="Donkey-App">
-                    <b-dropdown-item v-on:click="switchCurrency"><b-icon icon="gear"></b-icon> Choose Currency</b-dropdown-item>
+                <b-nav-item-dropdown text="Donkey-App" menu-class="bg-dark">
+                    <b-dropdown-item v-on:click="switchCurrency" link-class="text-white"><b-icon icon="gear"></b-icon> Choose Currency</b-dropdown-item>
                     <b-dropdown-divider></b-dropdown-divider>
-                    <b-dropdown-group id="dropdown-group-1" header="&#x21af; Currency Presets">
-                        <b-dropdown-item-button v-on:click="setCurrency({base: 'SGD', target: 'MYR'})">SGD - MYR</b-dropdown-item-button>
-                        <b-dropdown-item-button v-on:click="setCurrency({base: 'SGD', target: 'IDR'})">SGD - IDR</b-dropdown-item-button>
-                        <b-dropdown-item-button v-on:click="setCurrency({base: 'SGD', target: 'USD'})">SGD - USD</b-dropdown-item-button>
-                        <b-dropdown-item-button v-on:click="setCurrency({base: 'SGD', target: 'AUD'})">SGD - AUD</b-dropdown-item-button>
-                        <b-dropdown-item-button v-on:click="setCurrency({base: 'SGD', target: 'JPY'})">SGD - JPY</b-dropdown-item-button>
-                        <b-dropdown-item-button v-on:click="setCurrency({base: 'SGD', target: 'VND'})">SGD - VND</b-dropdown-item-button>
+                    <b-dropdown-group id="dropdown-group-1" header-classes="text-white" header-tag="header">
+                        <div slot="header">
+                            <b-icon icon="currency-exchange"></b-icon> Currency Presets
+                        </div>
+                        <b-dropdown-item-button button-class="text-white" v-on:click="setCurrency({base: 'SGD', target: 'MYR'})">SGD - MYR</b-dropdown-item-button>
+                        <b-dropdown-item-button button-class="text-white" v-on:click="setCurrency({base: 'SGD', target: 'IDR'})">SGD - IDR</b-dropdown-item-button>
+                        <b-dropdown-item-button button-class="text-white" v-on:click="setCurrency({base: 'SGD', target: 'USD'})">SGD - USD</b-dropdown-item-button>
+                        <b-dropdown-item-button button-class="text-white" v-on:click="setCurrency({base: 'SGD', target: 'AUD'})">SGD - AUD</b-dropdown-item-button>
+                        <b-dropdown-item-button button-class="text-white" v-on:click="setCurrency({base: 'SGD', target: 'JPY'})">SGD - JPY</b-dropdown-item-button>
+                        <b-dropdown-item-button button-class="text-white" v-on:click="setCurrency({base: 'SGD', target: 'VND'})">SGD - VND</b-dropdown-item-button>
+                        <b-dropdown-item-button button-class="text-white" v-on:click="setCurrency({base: 'SGD', target: 'EUR'})">SGD - EUR</b-dropdown-item-button>
                       </b-dropdown-group>
                     <b-dropdown-divider></b-dropdown-divider>
-                    <b-dropdown-item v-on:click="triggerUpdateExchangeRate"><b-icon icon="arrow-repeat"></b-icon> Update Exchange Rate</b-dropdown-item>
+                    <b-dropdown-item v-on:click="triggerUpdateExchangeRate" link-class="text-white"><b-icon icon="arrow-repeat"></b-icon> Update Exchange Rate</b-dropdown-item>
                 </b-nav-item-dropdown>
                 <b-nav-item v-on:click="showPrev10" :disabled="currentBaseNumber==1">&divide;10</b-nav-item>
                 <b-nav-item v-on:click="showNext10">&times;10</b-nav-item>
@@ -60,9 +68,10 @@
         <b-row class="text-center">
             <b-col cols="12">
                 <b-card-group deck>
-                    <b-card bg-variant="primary" text-variant="white" no-body
-                        header-tag="header">
-                        <div slot="header">{{ baseCurrency }} <span class="symbol">&raquo;</span> {{ targetCurrency }}</div>
+                    <b-card bg-variant="secondary" text-variant="white" no-body header-tag="header">
+                        <div slot="header" class="p-1 font-weight-bold">
+                            {{ baseCurrency }} <b-icon icon="caret-right-fill"></b-icon> {{ targetCurrency }}
+                        </div>
                         <b-list-group>
                             <donkey-parent v-for="(item, index) in currencyItems"
                             v-bind:key="item.baseAmt + '_' + baseCurrency + '_' + targetCurrency"
@@ -83,9 +92,8 @@
             v-bind:target-currency="targetCurrency"
             v-on:currency-changed="onCurrencyChangeEvent($event)"></donkey-option>
 
-        <div>Exchange rate was last updated on {{ rateLastUpdated }}</div>
+        <div class="text-white">Exchange rate was last updated on {{ rateLastUpdated }}</div>
         </template>
-
 
         <b-alert v-model="isAlertVisible" variant="danger" dismissible>
             {{ GlobalErrorMessage }}
@@ -93,7 +101,7 @@
 
         <hr />
         <blockquote class="blockquote">
-            <footer class="blockquote-footer"><a href="https://sudarpo.net">sudarpo.net</a></footer>
+            <footer class="blockquote-footer"><a href="https://sudarpo.net" class="text-warning">sudarpo.net</a></footer>
         </blockquote>
     </b-container>
     
