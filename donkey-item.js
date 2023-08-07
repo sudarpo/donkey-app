@@ -1,20 +1,25 @@
 //////////////////////////////////////////////////////////////////////
+// donkey-item component
+// :variant="isParent ? 'primary' : 'info'" 
 Vue.component("donkey-item", {
     props: ["currencyItem", "isParent"],
 
     template: `
     <b-list-group-item 
-    :variant="isParent ? 'primary' : 'info'" 
-    :button="isParent" 
-    v-on:click="$emit('click')">
-        <span>{{ currencyItem.baseAmtText }}</span>
-        <span> &raquo; </span>
-        <span>{{ currencyItem.targetAmtText }}</span>
+        :button="isParent" 
+        class="p-0"
+        v-on:click="$emit('click')">
+            <div class="d-flex">
+                <div class="p-2 pr-4 w-50 text-right bg-dark text-white">{{ currencyItem.baseAmtText }}</div>
+                <div class="p-2 pl-4 w-50 text-left bg-secondary text-white">{{ currencyItem.targetAmtText }}</div>
+            </div>
+
     </b-list-group-item>
 `
 });
 
 //////////////////////////////////////////////////////////////////////
+// donkey-parent component
 Vue.component("donkey-parent", {
     props: ["currencyItem", "isParent"],
     data: function () {
@@ -89,7 +94,7 @@ Vue.component("donkey-parent", {
                 v-bind:currency-item="currencyItem"
                 v-bind:is-parent="isParent">
             </donkey-item>
-            <b-list-group-item variant="warning" v-if="isOpened">
+            <b-list-group-item variant="dark" v-if="isOpened">
                 <b-list-group>
                     <donkey-item 
                     v-for="(item, index) in childItems"
@@ -104,6 +109,7 @@ Vue.component("donkey-parent", {
 
 
 //////////////////////////////////////////////////////////////////////
+// donkey-option component
 Vue.component("donkey-option", {
     props: ["CurrencyList", "BaseCurrency", "TargetCurrency"],
     data: function() {
@@ -137,8 +143,11 @@ Vue.component("donkey-option", {
 
     template: `
         <b-modal id="modal-switch-currency" size="xl" title="Switch Currency"
-            ok-only
-            v-on:ok="confirmCurrencyChanged">
+                ok-only ok-variant="secondary"
+                v-on:ok="confirmCurrencyChanged"
+                body-class="bg-dark text-white"
+                header-class="bg-dark text-white"
+                footer-class="bg-dark text-white">
             <b-row>
                 <b-col>
                     <label for="baseCurrency">Base currency</label>
@@ -182,3 +191,5 @@ Vue.component("donkey-option", {
         </b-modal>
     `
 });
+
+//////////////////////////////////////////////////////////////////////
