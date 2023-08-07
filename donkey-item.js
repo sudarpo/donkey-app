@@ -148,12 +148,12 @@ Vue.component("donkey-option", {
                 body-class="bg-dark text-white"
                 header-class="bg-dark text-white"
                 footer-class="bg-dark text-white">
-            <b-row>
+            <b-row class="mt-2">
                 <b-col>
                     <label for="baseCurrency">Base currency</label>
                 </b-col>
                 <b-col cols="6">
-                    <v-select id="baseCurrency" placeholder="-- select Base currency --" 
+                    <v-select class="currency-select" id="baseCurrency" placeholder="-- select Base currency --" 
                         :options="CurrencyList"
                         :reduce="c => c.code"
                         v-model="baseCurrencyCode"
@@ -163,12 +163,12 @@ Vue.component("donkey-option", {
                 </b-col>
                 <b-col>{{ baseCurrencyCode }}</b-col>
             </b-row>
-            <b-row>
+            <b-row class="mt-2">
                 <b-col>
                     <label for="targetCurrency">Target currency</label>
                 </b-col>
                 <b-col cols="6">
-                    <v-select id="targetCurrency" placeholder="-- select Target currency --" 
+                    <v-select class="currency-select" id="targetCurrency" placeholder="-- select Target currency --" 
                         :options="CurrencyList"
                         :reduce="c => c.code"
                         v-model="targetCurrencyCode"
@@ -178,7 +178,7 @@ Vue.component("donkey-option", {
                 </b-col>
                 <b-col>{{ targetCurrencyCode }}</b-col>
             </b-row>
-            <b-row>
+            <b-row class="mt-2">
                 <b-col>
                 </b-col>
                 <b-col cols="6">
