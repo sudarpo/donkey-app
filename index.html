@@ -78,6 +78,7 @@
 
         </b-navbar>
 
+        <!-- Item list -->
         <b-row class="text-center">
             <b-col cols="12">
                 <b-card-group deck>
@@ -100,17 +101,34 @@
             </b-col>
         </b-row>
 
+        <!-- User Options modal dialog -->
         <donkey-option v-bind:currency-list="currencyList"
             v-bind:base-currency="baseCurrency"
             v-bind:target-currency="targetCurrency"
             v-on:currency-changed="onCurrencyChangeEvent($event)"></donkey-option>
 
+        <!-- Custom Rate -->
+        <div class="input-group mt-3 mb-2">
+            <div class="input-group-prepend">
+                <div class="input-group-text">
+                    <input type="checkbox" id="useCustomRateCheckbox" title="Use custom exchange rate" aria-label="Use custom exchange rate"
+                        v-model="useCustomExchangeRate"
+                        v-on:change="onCustomRateInputChangedEvent">
+                </div>
+            </div>
+            <div class="input-group-prepend">
+                <label for="useCustomRateCheckbox" class="input-group-text">{{ strongerCurrencyLabel }} Rate</span>
+            </div>
+            <input type="number" aria-label="Custom exchange rate" placeholder="Custom exchange rate, e.g. 1.2345" class="form-control"
+                v-bind:disabled="useCustomExchangeRate === false"
+                v-model="customExchangeRate"
+                v-on:input="onCustomRateInputChangedEvent">
+        </div>
+            
+        <!-- Info bar -->
         <div class="text-white">Exchange rate was last updated on {{ rateLastUpdated }}</div>
-        </template>
 
-        <b-alert v-model="isAlertVisible" variant="danger" dismissible>
-            {{ GlobalErrorMessage }}
-        </b-alert>
+        </template>
 
         <hr />
         <blockquote class="blockquote">

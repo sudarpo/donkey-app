@@ -77,13 +77,16 @@ window.onload = () => {
                 baseCurrency: SC_UserOpt.baseCurrency,
                 targetCurrency: SC_UserOpt.targetCurrency,
                 currentBaseNumber: SC_UserOpt.baseNumber,
+                strongerCurrencyLabel: `${SC_UserOpt.baseCurrency} - ${SC_UserOpt.targetCurrency}`,
+                strongerCurrency: SC_UserOpt.baseCurrency,
                 currencyItems: [],
                 currencyList: [],
                 xchangeRate: 0.0,
                 rateLastUpdated: "",
                 isLoading: true,
-                GlobalErrorMessage: "",
-                isAlertVisible: false
+                isAlertVisible: false,
+                customExchangeRate: 0.0,
+                useCustomExchangeRate: false
             };
         },
         
@@ -128,7 +131,7 @@ window.onload = () => {
                 this.currencyList = SC_CurrencyList;
                 this.refreshLastUpdatedDate();
                 this.setXchangeRate();
-                this.buildItemList(this.currentBaseNumber);
+                this.buildItemList();
             },
 
             // Refresh exchange rate via openexchangerates
@@ -153,7 +156,27 @@ window.onload = () => {
                 let xrates = SC_XChangeRate.rates;
                 let baseXRate = parseFloat(xrates[this.targetCurrency]) / parseFloat(xrates[this.baseCurrency]);
                 console.log("xchange rates", baseXRate, parseFloat(xrates[this.targetCurrency]), parseFloat(xrates[this.baseCurrency]));
+                console.log("this.customExchangeRate", this.customExchangeRate);
+                
+                if (baseXRate >= 1.00) {
+                    this.strongerCurrencyLabel = `${this.baseCurrency} - ${this.targetCurrency}`;
+                    this.strongerCurrency = this.baseCurrency;
+                } else {
+                    this.strongerCurrencyLabel = `${this.targetCurrency} - ${this.baseCurrency}`;
+                    this.strongerCurrency = this.targetCurrency;
+                }
+                
                 this.xchangeRate = baseXRate;
+
+                if (this.useCustomExchangeRate === false) {
+                    this.customExchangeRate = this.xchangeRate;
+                } else {
+                    this.xchangeRate = this.customExchangeRate;
+                    
+                    if (this.strongerCurrency !== this.baseCurrency)
+                        this.xchangeRate = 1 / this.customExchangeRate;
+                }
+                
             },
 
             // Update base number
@@ -218,6 +241,12 @@ window.onload = () => {
                     this.makeToast("info", "Exchange rate is already the latest available rate. Exchange rate is ONLY updated every 1-hour.");
                 }
                 
+            },
+            
+            // Custom exchange rate event handler
+            onCustomRateInputChangedEvent() {
+                this.setXchangeRate();
+                this.buildItemList();
             },
 
             // For swap-currency clicked event from option modal page.
