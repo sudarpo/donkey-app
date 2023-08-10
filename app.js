@@ -156,7 +156,7 @@ window.onload = () => {
                 let xrates = SC_XChangeRate.rates;
                 let baseXRate = parseFloat(xrates[this.targetCurrency]) / parseFloat(xrates[this.baseCurrency]);
                 console.log("xchange rates", baseXRate, parseFloat(xrates[this.targetCurrency]), parseFloat(xrates[this.baseCurrency]));
-                console.log("this.customExchangeRate", this.customExchangeRate);
+                // console.log("this.customExchangeRate", this.customExchangeRate);
                 
                 if (baseXRate >= 1.00) {
                     this.strongerCurrencyLabel = `${this.baseCurrency} - ${this.targetCurrency}`;
@@ -170,11 +170,14 @@ window.onload = () => {
 
                 if (this.useCustomExchangeRate === false) {
                     this.customExchangeRate = this.xchangeRate;
+                    if (this.strongerCurrency !== this.baseCurrency) {
+                        this.customExchangeRate = 1 / this.xchangeRate;
+                    }
                 } else {
                     this.xchangeRate = this.customExchangeRate;
-                    
-                    if (this.strongerCurrency !== this.baseCurrency)
+                    if (this.strongerCurrency !== this.baseCurrency) {
                         this.xchangeRate = 1 / this.customExchangeRate;
+                    }
                 }
                 
             },
