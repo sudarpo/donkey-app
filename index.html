@@ -108,18 +108,20 @@
             v-on:currency-changed="onCurrencyChangeEvent($event)"></donkey-option>
 
         <!-- Custom Rate -->
-        <div class="input-group mt-3 mb-2">
+        <small id="useCustomRate" class="form-text text-muted">Tick checkbox to enter custom exchange.</small>
+        <div class="input-group my-2 custom-rate">
             <div class="input-group-prepend">
-                <div class="input-group-text">
+                <div class="input-group-text bg-dark text-white">
                     <input type="checkbox" id="useCustomRateCheckbox" title="Use custom exchange rate" aria-label="Use custom exchange rate"
                         v-model="useCustomExchangeRate"
                         v-on:change="onCustomRateInputChangedEvent">
                 </div>
             </div>
             <div class="input-group-prepend">
-                <label for="useCustomRateCheckbox" class="input-group-text">{{ strongerCurrencyLabel }} Rate</span>
+                <label for="useCustomRateCheckbox" class="input-group-text bg-dark text-white">{{ strongerCurrencyLabel }} Rate</span>
             </div>
-            <input type="number" aria-label="Custom exchange rate" placeholder="Custom exchange rate, e.g. 1.2345" class="form-control"
+            <input type="number" aria-label="Custom exchange rate" placeholder="Custom exchange rate, e.g. 1.2345" 
+                class="form-control text-white"
                 v-bind:disabled="useCustomExchangeRate === false"
                 v-model="customExchangeRate"
                 v-on:input="onCustomRateInputChangedEvent">
@@ -139,5 +141,13 @@
     <script src="currency-list.js"></script>
     <script src="donkey-item.js"></script>
     <script src="app.js"></script>
+    <style>
+        .custom-rate .form-control:disabled {
+            background-color: #343a40!important;
+        }
+        .custom-rate .form-control {
+            background-color: #101316!important;
+        }
+    </style>
 </body>
 </html>
