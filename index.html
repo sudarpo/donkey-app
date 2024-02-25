@@ -2,27 +2,26 @@
 <html lang="en">
 
 <head>
-    <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     
     <title>Donkey App - Currency Converter</title>
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-    <link rel="manifest" href="/site.webmanifest">
+    <link rel="apple-touch-icon" sizes="180x180" href="/donkey-app/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/donkey-app/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/donkey-app/favicon/favicon-16x16.png">
+    <link rel="manifest" href="/donkey-app/favicon/site.webmanifest">
     <link href="app-style.css" rel="stylesheet" type="text/css">
 
     <link rel="stylesheet" type="text/css" href="https://unpkg.com/bootstrap@4.6.2/dist/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="https://unpkg.com/bootstrap-vue@2.23.1/dist/bootstrap-vue.min.css">
     <link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap-vue@2.23.1/dist/bootstrap-vue-icons.min.css" />
+    
     <script type="text/javascript" src="https://unpkg.com/babel-polyfill@6.26.0/dist/polyfill.min.js"></script>
     <script type="text/javascript" src="https://unpkg.com/vue@2.7.14/dist/vue.min.js"></script>
     <script type="text/javascript" src="https://unpkg.com/bootstrap-vue@2.23.1/dist/bootstrap-vue.min.js"></script>
     <script type="text/javascript" src="https://unpkg.com/bootstrap-vue@2.23.1/dist/bootstrap-vue-icons.min.js"></script>
     <script type="text/javascript" src="https://unpkg.com/axios@1.4.0/dist/axios.min.js"></script>
 
-    <!-- use the latest vue-select release -->
     <script src="https://unpkg.com/vue-select@3.20.2/dist/vue-select.js"></script>
     <link rel="stylesheet" href="https://unpkg.com/vue-select@3.20.2/dist/vue-select.css">
     <style>
@@ -65,6 +64,7 @@
                         <b-dropdown-item-button button-class="text-white" v-on:click="setCurrency({base: 'SGD', target: 'USD'})">SGD - USD</b-dropdown-item-button>
                         <b-dropdown-item-button button-class="text-white" v-on:click="setCurrency({base: 'SGD', target: 'AUD'})">SGD - AUD</b-dropdown-item-button>
                         <b-dropdown-item-button button-class="text-white" v-on:click="setCurrency({base: 'SGD', target: 'JPY'})">SGD - JPY</b-dropdown-item-button>
+                        <b-dropdown-item-button button-class="text-white" v-on:click="setCurrency({base: 'SGD', target: 'CNY'})">SGD - CNY/RMB</b-dropdown-item-button>
                         <b-dropdown-item-button button-class="text-white" v-on:click="setCurrency({base: 'SGD', target: 'VND'})">SGD - VND</b-dropdown-item-button>
                         <b-dropdown-item-button button-class="text-white" v-on:click="setCurrency({base: 'SGD', target: 'EUR'})">SGD - EUR</b-dropdown-item-button>
                       </b-dropdown-group>
