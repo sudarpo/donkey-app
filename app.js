@@ -13,6 +13,17 @@ function CurrencyCode() {
     let countryName = "";
 }
 
+function defaultCurrencyPresets() {
+    return ["MYR", "IDR", "JPY", "USD", "TWD", "AUD", "EUR"]
+        .map(target => ({ base: "SGD", target: target }));
+}
+
+function isValidCurrencyPreset(preset) {
+    return preset && preset.base !== preset.target &&
+        Object.prototype.hasOwnProperty.call(tempCurrencyList, preset.base) &&
+        Object.prototype.hasOwnProperty.call(tempCurrencyList, preset.target);
+}
+
 function UserOptions() {
     let baseCurrency = "";
     let targetCurrency = "";
@@ -32,6 +43,7 @@ let UserPrefs = {
         SC_UserOpt.baseNumber = 1;
         SC_UserOpt.baseDecimalPoint = 2;
         SC_UserOpt.targetDecimalPoint = 2;
+        SC_UserOpt.currencyPresets = defaultCurrencyPresets();
         this.save();
     },
 
@@ -56,6 +68,11 @@ if (localStorage.UserPreferences) {
     UserPrefs.load();
     if (SC_UserOpt.baseNumber === undefined || SC_UserOpt.totalItemsPerPage === undefined) 
         UserPrefs.initialize();
+    else if (!Array.isArray(SC_UserOpt.currencyPresets) ||
+        !SC_UserOpt.currencyPresets.every(isValidCurrencyPreset)) {
+        SC_UserOpt.currencyPresets = defaultCurrencyPresets();
+        UserPrefs.save();
+    }
 }
 else {
     UserPrefs.initialize();
@@ -76,6 +93,10 @@ window.onload = () => {
                 totalItemsPerPage: SC_UserOpt.totalItemsPerPage,
                 baseCurrency: SC_UserOpt.baseCurrency,
                 targetCurrency: SC_UserOpt.targetCurrency,
+                currencyPresets: SC_UserOpt.currencyPresets,
+                presetBase: null,
+                presetTarget: null,
+                editingPresetIndex: -1,
                 currentBaseNumber: SC_UserOpt.baseNumber,
                 currencyItems: [],
                 currencyList: [],
@@ -94,6 +115,18 @@ window.onload = () => {
         computed: {
             strongerCurrencyRate() {
                 return this.apiRate >= 1 ? this.xchangeRate : 1 / this.xchangeRate;
+            },
+            presetValidationMessage() {
+                if (!this.presetBase || !this.presetTarget) return "";
+                if (!isValidCurrencyPreset({ base: this.presetBase, target: this.presetTarget }))
+                    return "Choose two different currencies.";
+                if (this.currencyPresets.some((preset, index) => index !== this.editingPresetIndex &&
+                    preset.base === this.presetBase && preset.target === this.presetTarget))
+                    return "This pair is already a preset.";
+                return "";
+            },
+            canSavePreset() {
+                return Boolean(this.presetBase && this.presetTarget && !this.presetValidationMessage);
             }
         },
         
@@ -261,6 +294,57 @@ window.onload = () => {
             // Toggle Switch Currency modal dialog
             switchCurrency() {
                 this.$bvModal.show("modal-switch-currency");
+            },
+
+            openPresetManager() {
+                this.resetPresetForm();
+                this.$bvModal.show("modal-currency-presets");
+            },
+
+            resetPresetForm() {
+                this.presetBase = null;
+                this.presetTarget = null;
+                this.editingPresetIndex = -1;
+            },
+
+            editPreset(index) {
+                this.editingPresetIndex = index;
+                this.presetBase = this.currencyPresets[index].base;
+                this.presetTarget = this.currencyPresets[index].target;
+            },
+
+            savePreset() {
+                if (!this.canSavePreset) return;
+                let presets = this.currencyPresets.slice();
+                let pair = { base: this.presetBase, target: this.presetTarget };
+                if (this.editingPresetIndex === -1)
+                    presets.push(pair);
+                else
+                    presets.splice(this.editingPresetIndex, 1, pair);
+                this.savePresets(presets);
+                this.resetPresetForm();
+            },
+
+            removePreset(index) {
+                let presets = this.currencyPresets.slice();
+                presets.splice(index, 1);
+                this.savePresets(presets);
+                this.resetPresetForm();
+            },
+
+            movePreset(index, direction) {
+                let presets = this.currencyPresets.slice();
+                let nextIndex = index + direction;
+                if (nextIndex < 0 || nextIndex >= presets.length) return;
+                presets.splice(nextIndex, 0, presets.splice(index, 1)[0]);
+                this.savePresets(presets);
+                this.resetPresetForm();
+            },
+
+            savePresets(presets) {
+                this.currencyPresets = presets;
+                SC_UserOpt.currencyPresets = presets;
+                UserPrefs.save();
             },
 
             // 

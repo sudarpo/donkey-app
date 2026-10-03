@@ -11,7 +11,6 @@
     <link rel="icon" type="image/png" sizes="32x32" href="/donkey-app/favicon/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/donkey-app/favicon/favicon-16x16.png">
     <link rel="manifest" href="/donkey-app/favicon/site.webmanifest">
-    <link href="app-style.css" rel="stylesheet" type="text/css">
 
     <link rel="stylesheet" type="text/css" href="https://unpkg.com/bootstrap@4.6.2/dist/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="https://unpkg.com/bootstrap-vue@2.23.1/dist/bootstrap-vue.min.css">
@@ -23,26 +22,11 @@
     <script type="text/javascript" src="https://unpkg.com/axios@1.20.0/dist/axios.min.js"></script>
 
     <!-- use the latest vue-select release -->
-    <script src="https://unpkg.com/vue-select@3.20.2/dist/vue-select.js"></script>
-    <link rel="stylesheet" href="https://unpkg.com/vue-select@3.20.2/dist/vue-select.css">
-    <style>
-        .card-header { font-size: 1.5rem; }
-        .list-group-item { font-size: 1.3rem; }
-        .dropdown-item:hover { background-color: #000; }
+    <script src="https://unpkg.com/vue-select@3/dist/vue-select.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/vue-select@3/dist/vue-select.css">
 
-        .currency-select .vs__search::placeholder, .vs--single .vs__selected,
-        .currency-select .vs__dropdown-toggle,
-        .currency-select .vs__dropdown-menu {
-            background: #0d0d0e;
-            border: none;
-            color: #eee;
-        }
-        .currency-select .vs__clear,
-        .currency-select .vs__open-indicator {
-            fill: #394066;
-            color: #eee;
-        }
-    </style>
+    <link href="app-style.css" rel="stylesheet" type="text/css">
+ 
 </head>
 
 <body class="bg-dark">
@@ -60,15 +44,11 @@
                         <div slot="header">
                             <b-icon icon="currency-exchange"></b-icon> Currency Presets
                         </div>
-                        <b-dropdown-item-button button-class="text-white" v-on:click="setCurrency({base: 'SGD', target: 'MYR'})">SGD - MYR</b-dropdown-item-button>
-                        <b-dropdown-item-button button-class="text-white" v-on:click="setCurrency({base: 'SGD', target: 'IDR'})">SGD - IDR</b-dropdown-item-button>
-                        <b-dropdown-item-button button-class="text-white" v-on:click="setCurrency({base: 'SGD', target: 'JPY'})">SGD - JPY</b-dropdown-item-button>
-                        <b-dropdown-item-button button-class="text-white" v-on:click="setCurrency({base: 'SGD', target: 'USD'})">SGD - USD</b-dropdown-item-button>
-                        <b-dropdown-item-button button-class="text-white" v-on:click="setCurrency({base: 'SGD', target: 'TWD'})">SGD - TWD</b-dropdown-item-button>
-                        <b-dropdown-item-button button-class="text-white" v-on:click="setCurrency({base: 'SGD', target: 'AUD'})">SGD - AUD</b-dropdown-item-button>
-                        <b-dropdown-item-button button-class="text-white" v-on:click="setCurrency({base: 'SGD', target: 'EUR'})">SGD - EUR</b-dropdown-item-button>
-                        <b-dropdown-item-button button-class="text-white" v-on:click="setCurrency({base: 'SGD', target: 'VND'})">SGD - VND</b-dropdown-item-button>
+                        <b-dropdown-item-button v-for="(preset, index) in currencyPresets" :key="index"
+                            button-class="text-white" v-on:click="setCurrency(preset)">{{ preset.base }} - {{ preset.target }}</b-dropdown-item-button>
+                        <b-dropdown-text v-if="!currencyPresets.length" text-class="text-white">No presets saved</b-dropdown-text>
                       </b-dropdown-group>
+                    <b-dropdown-item v-on:click="openPresetManager" link-class="text-white"><b-icon icon="sliders"></b-icon> Manage Presets</b-dropdown-item>
                     <b-dropdown-divider></b-dropdown-divider>
                     <b-dropdown-item v-on:click="triggerUpdateExchangeRate" link-class="text-white"><b-icon icon="arrow-repeat"></b-icon> Update Exchange Rate</b-dropdown-item>
                 </b-nav-item-dropdown>
@@ -105,6 +85,47 @@
             v-bind:base-currency="baseCurrency"
             v-bind:target-currency="targetCurrency"
             v-on:currency-changed="onCurrencyChangeEvent($event)"></donkey-option>
+
+        <b-modal id="modal-currency-presets" title="Manage Currency Presets" size="lg" hide-footer
+            body-class="bg-dark text-white" header-class="bg-dark text-white" footer-class="bg-dark text-white">
+            <b-list-group class="preset-list mb-3" v-if="currencyPresets.length">
+                <b-list-group-item v-for="(preset, index) in currencyPresets" :key="index"
+                    variant="dark" class="d-flex align-items-center justify-content-between flex-wrap">
+                    <span class="mr-2">{{ preset.base }} - {{ preset.target }}</span>
+                    <b-button-group size="sm" class="my-1">
+                        <b-button variant="outline-dark" v-on:click="movePreset(index, -1)" :disabled="index === 0"
+                            v-b-tooltip.hover title="Move up" :aria-label="'Move ' + preset.base + ' - ' + preset.target + ' up'"><b-icon icon="arrow-up"></b-icon></b-button>
+                        <b-button variant="outline-dark" v-on:click="movePreset(index, 1)" :disabled="index === currencyPresets.length - 1"
+                            v-b-tooltip.hover title="Move down" :aria-label="'Move ' + preset.base + ' - ' + preset.target + ' down'"><b-icon icon="arrow-down"></b-icon></b-button>
+                        <b-button variant="outline-dark" v-on:click="editPreset(index)"
+                            v-b-tooltip.hover title="Edit preset" :aria-label="'Edit ' + preset.base + ' - ' + preset.target"><b-icon icon="pencil"></b-icon></b-button>
+                        <b-button variant="outline-danger" v-on:click="removePreset(index)"
+                            v-b-tooltip.hover title="Remove preset" :aria-label="'Remove ' + preset.base + ' - ' + preset.target"><b-icon icon="trash"></b-icon></b-button>
+                    </b-button-group>
+                </b-list-group-item>
+            </b-list-group>
+            <p v-else>No presets saved.</p>
+            <b-row>
+                <b-col cols="12" md="5" class="mb-2">
+                    <label for="presetBase">Base currency</label>
+                    <v-select id="presetBase" class="currency-select" :options="currencyList"
+                        :reduce="currency => currency.code" label="countryName" v-model="presetBase"></v-select>
+                </b-col>
+                <b-col cols="12" md="5" class="mb-2">
+                    <label for="presetTarget">Target currency</label>
+                    <v-select id="presetTarget" class="currency-select" :options="currencyList"
+                        :reduce="currency => currency.code" label="countryName" v-model="presetTarget"></v-select>
+                </b-col>
+                <b-col cols="12" md="2" class="d-flex align-items-end mb-2">
+                    <b-button variant="secondary" block v-on:click="savePreset" :disabled="!canSavePreset">
+                        <b-icon :icon="editingPresetIndex === -1 ? 'plus' : 'check'"></b-icon>
+                        {{ editingPresetIndex === -1 ? 'Add' : 'Save' }}
+                    </b-button>
+                </b-col>
+            </b-row>
+            <div v-if="presetValidationMessage" class="text-warning" role="alert">{{ presetValidationMessage }}</div>
+            <b-button v-if="editingPresetIndex !== -1" variant="outline-light" size="sm" v-on:click="resetPresetForm">Cancel edit</b-button>
+        </b-modal>
 
         <div class="d-flex flex-wrap align-items-center text-white my-2 input-group">
           <div class="input-group-prepend">
