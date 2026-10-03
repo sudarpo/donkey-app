@@ -107,18 +107,18 @@
             v-on:currency-changed="onCurrencyChangeEvent($event)"></donkey-option>
 
         <div class="d-flex flex-wrap align-items-center text-white my-2 input-group">
-            <div class="input-group-prepend mr-1">
-                <div class="input-group-text">
-                  <input id="useCustomRate" type="checkbox"
-                      v-model="useCustomRate" v-on:change="onCustomRateToggle">
-                </div>
-                <label class="input-group-text form-check-label" for="useCustomRate">Use custom rate</label>
-            </div>
-            <label class="input-group-text mb-0 mr-1" for="customRate">{{ customRateLabel }}</label>
-            <input class="form-control" id="customRate" type="number" min="0" step="any"
-                inputmode="decimal" v-model="customRateText" v-on:input="onCustomRateInput"
-                v-bind:disabled="!useCustomRate" v-bind:aria-invalid="Boolean(rateInputError)"
-                aria-describedby="customRateError">
+          <div class="input-group-prepend">
+              <div class="input-group-text">
+                <input id="useCustomRate" type="checkbox"
+                    v-model="useCustomRate" v-on:change="onCustomRateToggle">
+              </div>
+              <label class="input-group-text form-check-label" for="useCustomRate">Use custom rate</label>
+          </div>
+          <!-- <label class="input-group-text mb-0" for="customRate">{{ customRateLabel }}</label> -->
+          <input class="form-control" id="customRate" type="number" min="0" step="any"
+              inputmode="decimal" v-model="customRateText" v-on:input="onCustomRateInput"
+              v-bind:disabled="!useCustomRate" v-bind:aria-invalid="Boolean(rateInputError)"
+              aria-describedby="customRateError">
         </div>
 
         <div>
