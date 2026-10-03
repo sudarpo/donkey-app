@@ -20,7 +20,7 @@
     <script type="text/javascript" src="https://unpkg.com/vue@2.7.14/dist/vue.min.js"></script>
     <script type="text/javascript" src="https://unpkg.com/bootstrap-vue@2.23.1/dist/bootstrap-vue.min.js"></script>
     <script type="text/javascript" src="https://unpkg.com/bootstrap-vue@2.23.1/dist/bootstrap-vue-icons.min.js"></script>
-    <script type="text/javascript" src="https://unpkg.com/axios@1.4.0/dist/axios.min.js"></script>
+    <script type="text/javascript" src="https://unpkg.com/axios@1.20.0/dist/axios.min.js"></script>
 
     <!-- use the latest vue-select release -->
     <script src="https://unpkg.com/vue-select@3.20.2/dist/vue-select.js"></script>
@@ -62,12 +62,12 @@
                         </div>
                         <b-dropdown-item-button button-class="text-white" v-on:click="setCurrency({base: 'SGD', target: 'MYR'})">SGD - MYR</b-dropdown-item-button>
                         <b-dropdown-item-button button-class="text-white" v-on:click="setCurrency({base: 'SGD', target: 'IDR'})">SGD - IDR</b-dropdown-item-button>
-                        <b-dropdown-item-button button-class="text-white" v-on:click="setCurrency({base: 'SGD', target: 'TWD'})">SGD - TWD</b-dropdown-item-button>
-                        <b-dropdown-item-button button-class="text-white" v-on:click="setCurrency({base: 'SGD', target: 'USD'})">SGD - USD</b-dropdown-item-button>
-                        <b-dropdown-item-button button-class="text-white" v-on:click="setCurrency({base: 'SGD', target: 'AUD'})">SGD - AUD</b-dropdown-item-button>
                         <b-dropdown-item-button button-class="text-white" v-on:click="setCurrency({base: 'SGD', target: 'JPY'})">SGD - JPY</b-dropdown-item-button>
-                        <b-dropdown-item-button button-class="text-white" v-on:click="setCurrency({base: 'SGD', target: 'VND'})">SGD - VND</b-dropdown-item-button>
+                        <b-dropdown-item-button button-class="text-white" v-on:click="setCurrency({base: 'SGD', target: 'USD'})">SGD - USD</b-dropdown-item-button>
+                        <b-dropdown-item-button button-class="text-white" v-on:click="setCurrency({base: 'SGD', target: 'TWD'})">SGD - TWD</b-dropdown-item-button>
+                        <b-dropdown-item-button button-class="text-white" v-on:click="setCurrency({base: 'SGD', target: 'AUD'})">SGD - AUD</b-dropdown-item-button>
                         <b-dropdown-item-button button-class="text-white" v-on:click="setCurrency({base: 'SGD', target: 'EUR'})">SGD - EUR</b-dropdown-item-button>
+                        <b-dropdown-item-button button-class="text-white" v-on:click="setCurrency({base: 'SGD', target: 'VND'})">SGD - VND</b-dropdown-item-button>
                       </b-dropdown-group>
                     <b-dropdown-divider></b-dropdown-divider>
                     <b-dropdown-item v-on:click="triggerUpdateExchangeRate" link-class="text-white"><b-icon icon="arrow-repeat"></b-icon> Update Exchange Rate</b-dropdown-item>
@@ -88,7 +88,7 @@
                         </div>
                         <b-list-group>
                             <donkey-parent v-for="(item, index) in currencyItems"
-                            v-bind:key="item.baseAmt + '_' + baseCurrency + '_' + targetCurrency"
+                            v-bind:key="item.baseAmt + '_' + baseCurrency + '_' + targetCurrency + '_' + item.excRate"
                             v-bind:is-parent="true"
                             v-bind:id="item.baseAmt"
                             v-bind:currency-item="item"></donkey-parent>
@@ -106,7 +106,30 @@
             v-bind:target-currency="targetCurrency"
             v-on:currency-changed="onCurrencyChangeEvent($event)"></donkey-option>
 
-        <div class="text-white">Exchange rate was last updated on {{ rateLastUpdated }}</div>
+        <div class="d-flex flex-wrap align-items-center text-white my-2 input-group">
+            <div class="input-group-prepend mr-1">
+                <div class="input-group-text">
+                  <input id="useCustomRate" type="checkbox"
+                      v-model="useCustomRate" v-on:change="onCustomRateToggle">
+                </div>
+                <label class="input-group-text form-check-label" for="useCustomRate">Use custom rate</label>
+            </div>
+            <label class="input-group-text mb-0 mr-1" for="customRate">{{ customRateLabel }}</label>
+            <input class="form-control" id="customRate" type="number" min="0" step="any"
+                inputmode="decimal" v-model="customRateText" v-on:input="onCustomRateInput"
+                v-bind:disabled="!useCustomRate" v-bind:aria-invalid="Boolean(rateInputError)"
+                aria-describedby="customRateError">
+        </div>
+
+        <div>
+          <label class="text-white">{{ customRateLabel }} = </label> 
+          <label class="text-white">{{ strongerCurrencyRate }}</label>
+        </div>
+
+        <div id="customRateError" class="text-warning" v-if="rateInputError" role="alert">{{ rateInputError }}</div>
+        <div class="alert alert-warning" v-if="useCustomRate">Custom exchange rate is active</div>
+        
+        <div class="text-white">API exchange rates last updated on {{ rateLastUpdated }}</div>
         </template>
 
         <b-alert v-model="isAlertVisible" variant="danger" dismissible>
