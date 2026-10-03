@@ -64,7 +64,9 @@
                 <b-card-group deck>
                     <b-card bg-variant="secondary" text-variant="white" no-body header-tag="header">
                         <div slot="header" class="p-1 font-weight-bold">
-                            {{ baseCurrency }} <b-icon icon="caret-right-fill"></b-icon> {{ targetCurrency }}
+                            <span v-on:click="switchCurrency">{{ baseCurrency }}</span>
+                              <b-icon icon="caret-right-fill"></b-icon> 
+                            <span v-on:click="switchCurrency">{{ targetCurrency }}</span>
                         </div>
                         <b-list-group>
                             <donkey-parent v-for="(item, index) in currencyItems"
