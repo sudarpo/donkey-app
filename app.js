@@ -80,11 +80,21 @@ window.onload = () => {
                 currencyItems: [],
                 currencyList: [],
                 xchangeRate: 0.0,
+                apiRate: 0.0,
+                customRateText: "",
+                customRateLabel: "",
+                useCustomRate: false,
+                rateInputError: "",
                 rateLastUpdated: "",
                 isLoading: true,
                 GlobalErrorMessage: "",
                 isAlertVisible: false
             };
+        },
+        computed: {
+            strongerCurrencyRate() {
+                return this.apiRate >= 1 ? this.xchangeRate : 1 / this.xchangeRate;
+            }
         },
         
         // Vue2 created - Called synchronously after the instance is created. 
@@ -153,7 +163,68 @@ window.onload = () => {
                 let xrates = SC_XChangeRate.rates;
                 let baseXRate = parseFloat(xrates[this.targetCurrency]) / parseFloat(xrates[this.baseCurrency]);
                 console.log("xchange rates", baseXRate, parseFloat(xrates[this.targetCurrency]), parseFloat(xrates[this.baseCurrency]));
-                this.xchangeRate = baseXRate;
+                this.apiRate = baseXRate;
+                let quoteBase = baseXRate >= 1 ? this.baseCurrency : this.targetCurrency;
+                let quoteTarget = baseXRate >= 1 ? this.targetCurrency : this.baseCurrency;
+                this.customRateLabel = `1 ${quoteBase} in ${quoteTarget}`;
+                let savedRate = SC_UserOpt.customRate;
+                let samePair = savedRate &&
+                    ((savedRate.base === quoteBase && savedRate.target === quoteTarget) ||
+                     (savedRate.base === quoteTarget && savedRate.target === quoteBase));
+                let validSavedRate = samePair && Number.isFinite(savedRate.rate) && savedRate.rate > 0 &&
+                    Number.isFinite(1 / savedRate.rate);
+
+                this.useCustomRate = Boolean(validSavedRate && savedRate.enabled);
+                this.customRateText = validSavedRate
+                    ? String(savedRate.base === quoteBase ? savedRate.rate : 1 / savedRate.rate)
+                    : String(baseXRate >= 1 ? baseXRate : 1 / baseXRate);
+                this.rateInputError = "";
+                this.xchangeRate = this.useCustomRate
+                    ? (savedRate.base === this.baseCurrency ? savedRate.rate : 1 / savedRate.rate)
+                    : baseXRate;
+            },
+
+            onCustomRateToggle() {
+                if (this.useCustomRate) {
+                    let quoteBase = this.apiRate >= 1 ? this.baseCurrency : this.targetCurrency;
+                    let quoteTarget = this.apiRate >= 1 ? this.targetCurrency : this.baseCurrency;
+                    let savedRate = SC_UserOpt.customRate;
+                    if (savedRate &&
+                        ((savedRate.base === quoteBase && savedRate.target === quoteTarget) ||
+                         (savedRate.base === quoteTarget && savedRate.target === quoteBase)) &&
+                        Number.isFinite(savedRate.rate) && savedRate.rate > 0 && Number.isFinite(1 / savedRate.rate)) {
+                        savedRate.enabled = true;
+                    }
+                    else {
+                        let rate = this.apiRate >= 1 ? this.apiRate : 1 / this.apiRate;
+                        SC_UserOpt.customRate = { base: quoteBase, target: quoteTarget, rate: rate, enabled: true };
+                    }
+                }
+                else if (SC_UserOpt.customRate) {
+                    SC_UserOpt.customRate.enabled = false;
+                }
+                UserPrefs.save();
+                this.setXchangeRate();
+                this.buildItemList();
+            },
+
+            onCustomRateInput() {
+                let rate = Number(this.customRateText);
+                if (this.customRateText === "" || !Number.isFinite(rate) || rate <= 0 || !Number.isFinite(1 / rate)) {
+                    this.rateInputError = "Enter a positive exchange rate.";
+                    return;
+                }
+
+                this.rateInputError = "";
+                SC_UserOpt.customRate = {
+                    base: this.apiRate >= 1 ? this.baseCurrency : this.targetCurrency,
+                    target: this.apiRate >= 1 ? this.targetCurrency : this.baseCurrency,
+                    rate: rate,
+                    enabled: true
+                };
+                UserPrefs.save();
+                this.xchangeRate = SC_UserOpt.customRate.base === this.baseCurrency ? rate : 1 / rate;
+                this.buildItemList();
             },
 
             // Update base number
