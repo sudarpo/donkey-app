@@ -31,7 +31,7 @@ var tempCurrencyList = {
   "CLF": "Chilean Unit of Account (UF)",
   "CLP": "Chilean Peso",
   "CNH": "Chinese Yuan (Offshore)",
-  "CNY": "Chinese Yuan",
+  "CNY": "Chinese Yuan / Renminbi [RMB]",
   "COP": "Colombian Peso",
   "CRC": "Costa Rican Colón",
   "CUC": "Cuban Convertible Peso",

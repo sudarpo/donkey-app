@@ -25,14 +25,14 @@
     <script src="https://unpkg.com/vue-select@3/dist/vue-select.js"></script>
     <link rel="stylesheet" href="https://unpkg.com/vue-select@3/dist/vue-select.css">
 
-    <link href="app-style.css" rel="stylesheet" type="text/css">
+    <link href="app-style.css?v=20261003001" rel="stylesheet" type="text/css">
  
 </head>
 
 <body class="bg-dark">
     
     <b-container fluid id="app">
-        <div v-if="isLoading">Loading...</div>
+        <div v-if="isLoading" class="text-white">Loading...</div>
 
         <template v-if="!isLoading">
         <b-navbar type="dark" variant="dark">
@@ -41,14 +41,14 @@
                     <b-dropdown-item v-on:click="switchCurrency" link-class="text-white"><b-icon icon="gear"></b-icon> Choose Currency</b-dropdown-item>
                     <b-dropdown-divider></b-dropdown-divider>
                     <b-dropdown-group id="dropdown-group-1" header-classes="text-white" header-tag="header">
-                        <div slot="header">
-                            <b-icon icon="currency-exchange"></b-icon> Currency Presets
-                        </div>
+                      <div slot="header">
+                        <b-icon icon="currency-exchange"></b-icon> Currency Presets
+                      </div>
+                        <b-dropdown-item v-on:click="openPresetManager" link-class="text-white"><b-icon icon="sliders"></b-icon> Manage Presets</b-dropdown-item>
                         <b-dropdown-item-button v-for="(preset, index) in currencyPresets" :key="index"
                             button-class="text-white" v-on:click="setCurrency(preset)">{{ preset.base }} - {{ preset.target }}</b-dropdown-item-button>
                         <b-dropdown-text v-if="!currencyPresets.length" text-class="text-white">No presets saved</b-dropdown-text>
-                      </b-dropdown-group>
-                    <b-dropdown-item v-on:click="openPresetManager" link-class="text-white"><b-icon icon="sliders"></b-icon> Manage Presets</b-dropdown-item>
+                    </b-dropdown-group>
                     <b-dropdown-divider></b-dropdown-divider>
                     <b-dropdown-item v-on:click="triggerUpdateExchangeRate" link-class="text-white"><b-icon icon="arrow-repeat"></b-icon> Update Exchange Rate</b-dropdown-item>
                 </b-nav-item-dropdown>
@@ -163,8 +163,8 @@
         </blockquote>
     </b-container>
     
-    <script src="currency-list.js"></script>
-    <script src="donkey-item.js"></script>
-    <script src="app.js?v=20261003-currency-presets-1"></script>
+    <script src="currency-list.js?v=20261003001"></script>
+    <script src="donkey-item.js?v=20261003001"></script>
+    <script src="app.js?v=20261003001"></script>
 </body>
 </html>
